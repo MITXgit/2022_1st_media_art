@@ -1,72 +1,87 @@
-let x = 0.2
-let y = 0.4
-let z = 0.6
-let w = 0.8
-let a = 100
+// Copyright (c) 2019 ml5
+//
+// This software is released under the MIT License.
+// https://opensource.org/licenses/MIT
+
+/* ===
+ml5 Example
+Webcam Image Classification using a pre-trained customized model and p5.js
+This example uses p5 preload function to create the classifier
+=== */
+
+// Classifier Variable
+let classifier;
+// Model URL
+let imageModelURL = 'https://teaachablemachine.withgoogle.com/models/b8tMMJ4tl/';
+
+// Video
+let video;
+let flippedVideo;
+// To store the classification
+let label = "";
+let c = 0
+// Load the model first
+function preload() {
+  classifier = ml5.imageClassifier(imageModelURL + 'model.json');
+}
 
 function setup() {
-    createCanvas(600, 600);
-    textSize(50);
+  createCanvas(320, 260);
+   //img_1 = loadImage('assets/moonwalk.jpg');
+   //img_2 = loadImage('assets/moonwalk.jpg'); 
+   //img_3 = loadImage('assets/moonwalk.jpg'); 
+  // Create the video
+  video = createCapture(VIDEO);
+  video.size(320, 240);
+  video.hide();
+
+  flippedVideo = ml5.flipImage(video)
+  // Start classifying
+  classifyVideo();
 }
 
 function draw() {
-    background(50);
-    
-    putRect(x,a);
-    putRect(y,a);
-    putRect(z,a);
-    putRect(w,a);
-    
-    putText('Q',x);
-    putText('W',y);
-    putText('E',z);
-    putText('R',w);
+  background(c);
+  // Draw the video
+  image(flippedVideo, 0, 0);
 
-    //textNo();  
+  // Draw the label
+  fill(255);
+  textSize(16);
+  textAlign(CENTER);
+  text(label, width / 2, height - 4);
+  
+  if(label == "OHYEAH"){
+    ellipse(56, 46, 55, 55);
+    //image(img_1,width/2,height/2);
+     }
+  else if(label == "GOOD") {
+    ellipse(50, 50, 55, 55);
+    //image(img_2,width/2,height/2);
+  }
+  else{
+    ellipse(60, 60, 55, 55);
+    //image(img_3,width/2,height/2);
+  }
 }
 
-function keyTyped() {
-    if (key === 'q') {
-        a=255;
-    } else if (key === 'w') {
-        a=200;
-    } else if (key === 'e') {
-        a=150;
-    } else if (key === 'r') {
-        a=100;
-    }
+// Get a prediction for the current video frame
+function classifyVideo() {
+  flippedVideo = ml5.flipImage(video)
+  classifier.classify(flippedVideo, gotResult);
 }
 
-function putRect(a,b) {
-    // if (keyIsPressed === true) {
-    //     fill(100,200);
-    // } else {
-    //     fill(200,100);
-    // }
-    noStroke();
-    fill(b);
-    rectMode(RADIUS);
-    rect(height*a, width*0.8,30);
+// When we get a result
+function gotResult(error, results) {
+  // If there is an error
+  if (error) {
+    console.error(error);
+    return;
+  }
+  // The results are in an array ordered by confidence.
+  // console.log(results[0]);
+  label = results[0].label;
+  c = 255;
+  // Classifiy again!
+  classifyVideo();
 }
-
-
-
-function putText(a,b) {
-    textSize(30);
-    fill(155,230,0);
-    text(a, height*b, width*0.8);   
-}
-
-
-
-
-// function textNo(a) {
-//     b = random();
-//     fill(a,0,0);
-//     textSize(100);
-//     // let i = random("nice");
-//     text(b, height/2, width/2);
-// }
-
-// function 
-
